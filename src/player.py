@@ -43,13 +43,14 @@ class Player:
       args = action['args']
       kwargs = action['kwargs']
       action['func'](*args, **kwargs)
-      self.timer = threading.Timer(self.cooldown, self.next_action, args=(self))
+    if len(self.queue) > 0:
+      self.timer = threading.Timer(self.cooldown, self.next_action)
       self.timer.start()
 
   def queue_func(self, func, *_args, **_kwargs):
     self.queue.push({'func': func, 'args': _args, 'kwargs': _kwargs})
     if len(self.queue) == 1:
-      self.timer = threading.Timer(self.cooldown, self.next_action, args=(self))
+      self.timer = threading.Timer(self.cooldown, self.next_action)
       self.timer.start()
   
   def init(self):
@@ -69,3 +70,5 @@ class Player:
 
 ply = Player()
 ply.init()
+ply.queue_func(ply.move,'s')
+ply.queue_func(ply.move, 's')

@@ -8,6 +8,10 @@ import json
 saved_adjacency = dict()
 with open('rooms.json') as json_file:
     saved_adjacency = json.load(json_file)
+temp_adj = dict()
+for key, value in saved_adjacency.items():
+  temp_adj[int(key)] = value
+saved_adjacency = temp_adj
 
 player = Player()
 player.queue_func(player.init)

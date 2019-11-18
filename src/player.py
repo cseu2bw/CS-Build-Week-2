@@ -27,7 +27,7 @@ class Player:
     to_send = {'direction': dir}
     if id is not None:
       to_send["next_room_id"] = id
-      print('Moving into known room ' + id)
+      print(f'Moving into known room {id}')
     response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json=to_send)
     try:
         data = response.json()
@@ -58,7 +58,7 @@ class Player:
       self.next_action()
 
   def travel(self, dir, id=None):
-    print(f"Tryinf to move {dir} to {id}")
+    print(f"Trying to move {dir} to {id}")
     if dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
   

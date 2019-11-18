@@ -3,6 +3,12 @@ from room import Room
 from util import Stack, Queue
 import random
 
+import json
+
+adj = dict()
+with open('rooms.json') as json_file:
+    adj = json.load(json_file)
+
 player = Player()
 player.init()
 
@@ -24,7 +30,7 @@ def findShortestPath(adj):
     q = Queue()
     q.enqueue([player.current_room.id])
     visited = set()
-    while q.size() > 0:
+    while q.len() > 0:
         path = q.dequeue()
         vert = path[-1]
         if vert not in visited:
@@ -56,6 +62,8 @@ def createTraversalPath(lastDir=None, lastRoom=None, adjacency=dict(), traversal
   global player
   global traversalPath
   #player.cooldown = 0
+  with open('rooms.json', 'w') as json_file:
+    json.dump(adjacency, json_file)
   print(player.current_room.id, player.current_room.exits)
   if len(adjacency) < 500:
     print(adjacency)

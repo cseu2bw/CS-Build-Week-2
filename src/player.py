@@ -1,6 +1,7 @@
 import requests
 import os
 import threading
+import time
 from room import Room
 from util import Queue
 
@@ -42,13 +43,15 @@ class Player:
     return self.cooldown
 
   def next_action(self):
-    self.cooldown = 0.1
+    print(f"Running next action from cooldown {self.cooldown}")
+    self.cooldown = 1
     if len(self.queue) > 0:
       action = self.queue.dequeue()
       args = action['args']
       kwargs = action['kwargs']
       action['func'](*args, **kwargs)
     if len(self.queue) > 0:
+      print(f"Setting cooldown to {self.cooldown}")
       self.timer = threading.Timer(self.cooldown, self.next_action)
       self.timer.start()
 
@@ -56,10 +59,10 @@ class Player:
   def queue_func(self, func, *_args, **_kwargs):
     self.queue.enqueue({'func': func, 'args': _args, 'kwargs': _kwargs})
     if len(self.queue) == 1:
-      self.timer = threading.Timer(self.cooldown, self.next_action)
-      self.timer.start()
+      self.next_action()
 
   def travel(self, dir, id=None):
+    print(f"Tryinf to move {dir} to {id}")
     if dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
   

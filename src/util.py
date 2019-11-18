@@ -2,10 +2,10 @@ class Queue:
   def __init__(self):
       self.storage = list()
 
-  def push(self, value):
+  def enqueue(self, value):
       self.storage.append(value)
 
-  def pop(self):
+  def dequeue(self):
     if self.len() > 0:
       return self.storage.pop(0)
     else:
@@ -23,7 +23,7 @@ class Stack:
       self.storage = list()
 
   def push(self, value):
-      self.storage.append()
+      self.storage.append(value)
 
   def pop(self):
       return self.storage.pop()

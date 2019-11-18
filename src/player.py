@@ -20,11 +20,15 @@ class Player:
     self.timer = None
 
 
-  def move(self, dir):
+  def move(self, dir, id=None):
     if dir not in self.current_room.exits:
       print('Invalid direction ' + dir)
       return
-    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json={'direction': dir})
+    to_send = {'direction': dir}
+    if id is not None:
+      to_send["next_room_id"] = id
+      print('Moving into known room ' + id)
+    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json=to_send)
     try:
         data = response.json()
     except ValueError:
@@ -38,8 +42,9 @@ class Player:
     return self.cooldown
 
   def next_action(self):
+    self.cooldown = 0.1
     if len(self.queue) > 0:
-      action = self.queue.pop()
+      action = self.queue.dequeue()
       args = action['args']
       kwargs = action['kwargs']
       action['func'](*args, **kwargs)
@@ -47,11 +52,16 @@ class Player:
       self.timer = threading.Timer(self.cooldown, self.next_action)
       self.timer.start()
 
+
   def queue_func(self, func, *_args, **_kwargs):
-    self.queue.push({'func': func, 'args': _args, 'kwargs': _kwargs})
+    self.queue.enqueue({'func': func, 'args': _args, 'kwargs': _kwargs})
     if len(self.queue) == 1:
       self.timer = threading.Timer(self.cooldown, self.next_action)
       self.timer.start()
+
+  def travel(self, dir, id=None):
+    if dir in ['n', 's', 'e', 'w']:
+      self.queue_func(self.move, dir, id)
   
   def init(self):
     data = None

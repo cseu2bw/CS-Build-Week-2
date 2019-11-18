@@ -44,18 +44,21 @@ def getDirPath(adj, path):
             lastRoom = path[idx - 1]
             for direction in adj[lastRoom]:
                 if adj[lastRoom][direction] == room:
-                    new_path.append(direction)
+                    new_path.append({'dir': direction, 'next_room': room})
     return new_path
 
 def travelDirPath(traversal, path):
-    for direction in path:
-        traversal.append(direction)
-        player.travel(direction)
+    for dir in path:
+        traversal.append(dir['dir'])
+        player.travel(dir['dir'], dir['next_room'])
 
 def createTraversalPath(lastDir=None, lastRoom=None, adjacency=dict(), traversal=Stack()):
   global player
   global traversalPath
+  #player.cooldown = 0
+  print(player.current_room.id, player.current_room.exits)
   if len(adjacency) < 500:
+    print(adjacency)
     if player.current_room.id not in adjacency:
         adj = dict()
         for ext in player.current_room.exits:
@@ -87,3 +90,5 @@ def createTraversalPath(lastDir=None, lastRoom=None, adjacency=dict(), traversal
             lastDir = dir_path[-1]
             lastRoom = path[-2]
     player.queue_func(createTraversalPath, lastDir, lastRoom)
+
+createTraversalPath()

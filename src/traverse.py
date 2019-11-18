@@ -2,11 +2,15 @@ from player import Player
 from room import Room
 from util import Stack, Queue
 import random
+import os
+
+dir = os.path.dirname(__file__)
+rooms_file = os.path.join(dir, '../rooms.json')
 
 import json
 
 saved_adjacency = dict()
-with open('rooms.json') as json_file:
+with open(rooms_file) as json_file:
     saved_adjacency = json.load(json_file)
 temp_adj = dict()
 for key, value in saved_adjacency.items():
@@ -92,7 +96,7 @@ def createTraversalPath(lastDir=None, lastRoom=None, adjacency=saved_adjacency):
         if path is not None:
             dir_path = getDirPath(adjacency, path)
             travelDirPath(dir_path)
-            lastDir = dir_path[-1]
+            lastDir = dir_path[-1]['dir']
             lastRoom = path[-2]
     player.queue_func(createTraversalPath, lastDir, lastRoom)
 

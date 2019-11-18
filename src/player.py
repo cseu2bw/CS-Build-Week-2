@@ -36,9 +36,9 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    self.next_action_time = time.time() + int(data.get('cooldown'))
+    self.next_action_time = time.time() + int(data.get('cooldown')) + 0.1
     self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
-    print('Moved ' + dir)
+    print("Respose:", data)
 
   def next_action(self):
     cooldown = max(0, (self.next_action_time - time.time()))
@@ -72,5 +72,5 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    self.next_action_time = time.time() + int(data.get('cooldown'))
+    self.next_action_time = time.time() + int(data.get('cooldown')) + 0.1
     self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))

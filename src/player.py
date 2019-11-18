@@ -21,8 +21,7 @@ class Player:
     if dir not in self.current_room.exits:
       print('Invalid direction ' + dir)
       return
-    print(self, dir, self.base_url, self.token)
-    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, data={'direction': dir})
+    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json={'direction': dir})
     try:
         data = response.json()
     except ValueError:

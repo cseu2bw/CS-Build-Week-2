@@ -2,7 +2,7 @@ import requests
 import os
 import threading
 from room import Room
-from queue import Queue
+from util import Queue
 
 base_url = os.environ['BASE_URL']
 token  = os.environ['TOKEN']
@@ -54,7 +54,6 @@ class Player:
   
   def init(self):
     data = None
-    print(self.base_url, self.token)
     response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})
     try:
         data = response.json()
@@ -63,8 +62,8 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    #self.cooldown = int(data.get('cooldown'))
-    #self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
+    self.cooldown = int(data.get('cooldown'))
+    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
     return self.cooldown
 
 

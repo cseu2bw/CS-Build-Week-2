@@ -7,7 +7,7 @@ class Queue:
 
   def pop(self):
     if self.len() > 0:
-      self.storage.pop(0)
+      return self.storage.pop(0)
     else:
       return None
 

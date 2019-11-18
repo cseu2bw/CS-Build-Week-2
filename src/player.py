@@ -54,7 +54,7 @@ class Player:
   
   def init(self):
     data = None
-    print(self.base_url + '/adv/init/', self.token)
+    print(self.base_url, self.token)
     response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})
     try:
         data = response.json()
@@ -63,12 +63,10 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    self.cooldown = int(data.get('cooldown'))
-    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
+    #self.cooldown = int(data.get('cooldown'))
+    #self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
     return self.cooldown
 
 
 ply = Player()
-print(ply.init())
-ply.queue_func(Player.move, ply, 's')
-ply.queue_func(Player.move, ply, 's')
+ply.init()

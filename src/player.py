@@ -2,6 +2,7 @@ import requests
 import os
 import threading
 from room import Room
+from queue import Queue
 
 base_url = os.environ['BASE_URL']
 token  = os.environ['TOKEN']
@@ -15,6 +16,8 @@ class Player:
     self.base_url = base_url
     self.cooldown = 0
     self.current_room = Room()
+    self.queue = Queue()
+    self.timer = None
 
 
   def move(self, dir):
@@ -34,10 +37,20 @@ class Player:
     print('Moved ' + dir)
     return self.cooldown
 
-  def queue_request(self, func, *_args, **_kwargs):
-    timer = threading.Timer(self.cooldown, func, args=_args, kwargs=_kwargs)
-    timer.start()
-    return timer
+  def next_action(self):
+    if len(self.queue) > 0:
+      action = self.queue.pop()
+      args = action['args']
+      kwargs = action['kwargs']
+      action['func'](*args, **kwargs)
+      self.timer = threading.Timer(self.cooldown, self.next_action, args=(self))
+      self.timer.start()
+
+  def queue_func(self, func, *_args, **_kwargs):
+    self.queue.push({'func': func, 'args': _args, 'kwargs': _kwargs})
+    if len(self.queue) == 1:
+      self.timer = threading.Timer(self.cooldown, self.next_action, args=(self))
+      self.timer.start()
   
   def init(self):
     data = None
@@ -57,4 +70,5 @@ class Player:
 
 ply = Player()
 print(ply.init())
-ply.queue_request(Player.move, ply, 'n')
+ply.queue_func(Player.move, ply, 's')
+ply.queue_func(Player.move, ply, 's')

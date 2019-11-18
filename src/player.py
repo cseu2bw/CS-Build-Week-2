@@ -66,9 +66,3 @@ class Player:
     self.cooldown = int(data.get('cooldown'))
     self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
     return self.cooldown
-
-
-ply = Player()
-ply.init()
-ply.queue_func(ply.move,'s')
-ply.queue_func(ply.move, 's')

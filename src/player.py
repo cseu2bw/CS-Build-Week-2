@@ -26,7 +26,7 @@ class Player:
       return
     to_send = {'direction': dir}
     if id is not None:
-      to_send["next_room_id"] = id
+      to_send["next_room_id"] = str(id)
       print(f'Moving into known room {id}')
     response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json=to_send)
     try:

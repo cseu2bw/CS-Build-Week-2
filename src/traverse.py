@@ -75,7 +75,11 @@ def createTraversalPath(lastDir=None, lastRoom=None, adjacency=saved_rooms['adja
   global player
   rooms[player.current_room.id] = {
     'title': player.current_room.title,
-    'description': player.current_room.description
+    'description': player.current_room.description,
+    'coordinates': player.current_room.coordinates,
+    'elevation': player.current_room.elevation,
+    'terrain': player.current_room.terrain,
+    'items': player.current_room.items
   }
   with open(rooms_file, 'w') as json_file:
     json.dump(saved_rooms, json_file)

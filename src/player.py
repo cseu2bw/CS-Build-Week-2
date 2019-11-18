@@ -15,10 +15,9 @@ class Player:
   def __init__(self):
     self.token = 'Token ' + token
     self.base_url = base_url
-    self.cooldown = 0
+    self.next_action_time = time.time()
     self.current_room = Room()
     self.queue = Queue()
-    self.timer = None
 
 
   def move(self, dir, id=None):
@@ -37,15 +36,15 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    self.cooldown = int(data.get('cooldown'))
+    self.next_action_time = time.time() + int(data.get('cooldown'))
     self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
     print('Moved ' + dir)
-    return self.cooldown
 
   def next_action(self):
-    time.sleep(self.cooldown)
-    print(f"Running next action from cooldown {self.cooldown}")
-    self.cooldown = 0
+    cooldown = max(0, (self.next_action_time - time.time()))
+    time.sleep(cooldown)
+    print(f"Running next action from cooldown {cooldown}")
+    self.next_action_time = time.time()
     if len(self.queue) > 0:
       action = self.queue.dequeue()
       args = action['args']
@@ -73,6 +72,5 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    self.cooldown = int(data.get('cooldown'))
+    self.next_action_time = time.time() + int(data.get('cooldown'))
     self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
-    return self.cooldown

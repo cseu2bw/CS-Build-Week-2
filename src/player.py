@@ -43,17 +43,14 @@ class Player:
     return self.cooldown
 
   def next_action(self):
+    time.sleep(self.cooldown)
     print(f"Running next action from cooldown {self.cooldown}")
-    self.cooldown = 1
+    self.cooldown = 0
     if len(self.queue) > 0:
       action = self.queue.dequeue()
       args = action['args']
       kwargs = action['kwargs']
       action['func'](*args, **kwargs)
-    if len(self.queue) > 0:
-      print(f"Setting cooldown to {self.cooldown}")
-      self.timer = threading.Timer(self.cooldown, self.next_action)
-      self.timer.start()
 
 
   def queue_func(self, func, *_args, **_kwargs):

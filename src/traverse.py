@@ -5,14 +5,12 @@ import random
 
 import json
 
-adj = dict()
+saved_adjacency = dict()
 with open('rooms.json') as json_file:
-    adj = json.load(json_file)
+    saved_adjacency = json.load(json_file)
 
 player = Player()
-player.init()
-
-traversalPath = []
+player.queue_func(player.init)
 
 def reverseDir(dir):
     if dir == "n":
@@ -53,20 +51,17 @@ def getDirPath(adj, path):
                     new_path.append({'dir': direction, 'next_room': room})
     return new_path
 
-def travelDirPath(traversal, path):
+def travelDirPath(path):
     for dir in path:
-        traversal.append(dir['dir'])
         player.travel(dir['dir'], dir['next_room'])
 
-def createTraversalPath(lastDir=None, lastRoom=None, adjacency=dict(), traversal=Stack()):
+def createTraversalPath(lastDir=None, lastRoom=None, adjacency=saved_adjacency):
   global player
-  global traversalPath
-  #player.cooldown = 0
   with open('rooms.json', 'w') as json_file:
     json.dump(adjacency, json_file)
-  print(player.current_room.id, player.current_room.exits)
+  print("Current room:", player.current_room.id, player.current_room.exits)
   if len(adjacency) < 500:
-    print(adjacency)
+    print(f"Traversed rooms: {len(adjacency)}")
     if player.current_room.id not in adjacency:
         adj = dict()
         for ext in player.current_room.exits:
@@ -87,14 +82,12 @@ def createTraversalPath(lastDir=None, lastRoom=None, adjacency=dict(), traversal
         random.shuffle(unvisited)
         direction = unvisited[0]
         lastDir = direction
-        traversal.push(direction)
-        traversalPath.append(direction)
         player.travel(direction)
     else:
         path = findShortestPath(adjacency)
         if path is not None:
             dir_path = getDirPath(adjacency, path)
-            travelDirPath(traversalPath, dir_path)
+            travelDirPath(dir_path)
             lastDir = dir_path[-1]
             lastRoom = path[-2]
     player.queue_func(createTraversalPath, lastDir, lastRoom)

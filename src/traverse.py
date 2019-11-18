@@ -9,13 +9,21 @@ rooms_file = os.path.join(dir, '../rooms.json')
 
 import json
 
-saved_adjacency = dict()
-with open(rooms_file) as json_file:
-    saved_adjacency = json.load(json_file)
-temp_adj = dict()
-for key, value in saved_adjacency.items():
-  temp_adj[int(key)] = value
-saved_adjacency = temp_adj
+saved_rooms = dict()
+try:
+  with open(rooms_file) as json_file:
+      saved_rooms = json.load(json_file)
+  temp_adj = dict()
+  temp_rooms = dict()
+  for key, value in saved_rooms['adjacency'].items():
+    temp_adj[int(key)] = value
+  saved_rooms['adjacency'] = temp_adj
+  for key, value in saved_rooms['rooms'].items():
+    temp_rooms[int(key)] = value
+  saved_rooms['rooms'] = temp_rooms
+except:
+  saved_rooms['adjacency'] = dict()
+  saved_rooms['rooms'] = dict()
 
 player = Player()
 player.queue_func(player.init)
@@ -63,10 +71,14 @@ def travelDirPath(path):
     for dir in path:
         player.travel(dir['dir'], dir['next_room'])
 
-def createTraversalPath(lastDir=None, lastRoom=None, adjacency=saved_adjacency):
+def createTraversalPath(lastDir=None, lastRoom=None, adjacency=saved_rooms['adjacency'], rooms=saved_rooms['rooms']):
   global player
-  with open('rooms.json', 'w') as json_file:
-    json.dump(adjacency, json_file)
+  rooms[player.current_room.id] = {
+    'title': player.current_room.title,
+    'description': player.current_room.description
+  }
+  with open(rooms_file, 'w') as json_file:
+    json.dump(saved_rooms, json_file)
   print("Current room:", player.current_room.id, player.current_room.exits)
   if len(adjacency) < 500:
     print(f"Traversed rooms: {len(adjacency)}")

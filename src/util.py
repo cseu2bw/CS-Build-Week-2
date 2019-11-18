@@ -26,7 +26,9 @@ class Stack:
       self.storage.append()
 
   def pop(self):
-      pass
+      return self.storage.pop()
 
   def len(self):
-      len(self.storage)
+      return len(self.storage)
+  def __len__(self):
+    return self.len()

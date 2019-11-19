@@ -17,7 +17,7 @@ class Actions:
         self.player = player
         self.base_url = base_url
         self.message = ''
-        self.last_proof = 0
+        self.last_proof = Proof()
         # self.other_player = Status()
 
     def take(self, item):
@@ -291,7 +291,7 @@ class Actions:
 
     def mine(self, new_proof):
         response = requests.post(self.base_url + '/bc/mine/',
-                                 headers={'Authorization': self.player.token, 'proof': new_proof})
+                                 headers={'Authorization': self.player.token, 'proof': int(new_proof)})
         try:
             data = response.json()
         except ValueError:
@@ -299,12 +299,12 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.message = data.get('messages')[0]
+        # self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        # self.message = data.get('messages')[0]
         print("Response:", data)
 
     def get_last_proof(self):
-        response = requests.post(self.base_url + '/bc/last_proof/',
+        response = requests.get(self.base_url + '/bc/last_proof/',
                                  headers={'Authorization': self.player.token})
         try:
             data = response.json()
@@ -313,7 +313,7 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        # self.player.next_action_time = time.time() + float(data.get('cooldown'))
         self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get(
             'cooldown'), data.get('message'), data.get('errors'))
         print("Response:", data)        

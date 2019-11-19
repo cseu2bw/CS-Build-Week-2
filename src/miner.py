@@ -1,10 +1,6 @@
-import requests
 import sys
 import os
 import json
-import random
-from uuid import uuid4
-from timeit import default_timer as timer
 import random
 
 from actions import Actions
@@ -21,6 +17,7 @@ if __name__ == '__main__':
         miner.get_last_proof()
         new_proof = miner.proof_of_work(
             miner.last_proof.proof, miner.last_proof.difficulty)
-        miner.mine(str(new_proof))
-        print(miner.message)
+        print(new_proof)
+        # miner.mine(str(new_proof))
+        # print(miner.message)
         mining += 1

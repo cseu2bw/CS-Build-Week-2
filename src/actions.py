@@ -2,13 +2,13 @@ import requests
 import os
 import threading
 import time
-from player import Player
 from room import Room
 from util import Queue
 from status import Status
 from timeit import default_timer as timer
 import hashlib
 import random
+from proof import Proof
 
 base_url = os.environ['BASE_URL']
 
@@ -17,7 +17,7 @@ class Actions:
         self.player = player
         self.base_url = base_url
         self.message = ''
-        self.status = Status()
+        self.last_proof = 0
         # self.other_player = Status()
 
     def take(self, item):
@@ -91,7 +91,7 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def examine(self, item_or_player):
@@ -105,6 +105,9 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.last_examine = dict()
+        self.player.last_examine['name'] = data.get('name')
+        self.player.last_examine["description"] = data.get('description')
         # self.other_player = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
@@ -119,7 +122,7 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def undress(self, item):
@@ -133,12 +136,12 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def change_name(self, new_name):
         response = requests.post(self.base_url + '/adv/change_name/',
-                                 headers={'Authorization': self.player.token}, json={'name': new_name})
+                                 headers={'Authorization': self.player.token}, json={'name': new_name, 'confirm': 'aye'})
         try:
             data = response.json()
         except ValueError:
@@ -147,7 +150,7 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def pray(self):
@@ -260,45 +263,84 @@ class Actions:
             'description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
         print("Response:", data)
 
-
-
     def proof_of_work(self, last_proof, difficulty):
-        N = difficulty
+
         start = timer()
+
         print("Searching for next proof")
-        proof = random.random()
+        print(last_proof)
+
+        # start at number different from 0
+        proof = 20000000
+        # proof = random.randint(20000000, 99999999)
+        while valid_proof(last_proof, proof, difficulty) is False:
+            proof -= 1
+
         print("Proof found: " + str(proof) + " in " + str(timer() - start))
-        while self.valid_proof(last_proof, proof, N) is False:
-            proof += 1
-        return proof       
+        return proof    
 
-    def valid_proof(self, last_hash, proof, n):
-        guess_hash = hashlib.sha256(f'{last_hash}{proof}'.encode()).hexdigest()
-        new_N = '0' * n
-        return guess_hash[:6] == new_N 
+    def valid_proof(self, last_proof, proof, difficulty):
+        # stringify and encode the supposed proof answer
+        guess = f'{last_proof}{proof}'.encode()
+        # hash the supposed proof
+        guess_hash = hashlib.sha256(guess).hexdigest()
+        # Does hash(last_proof, proof) contain N leading zeroes, where N is the current difficulty level?
+        # print(guess_hash)
+        # hardcoded with difficulty 6
+        return guess_hash[:difficulty] == '000000'
 
-    def mine_coin(self):
-        coins_mined = 0
-        print("Starting miner")
-        response = requests.get(url=self.base_url + "/bc/last_proof", headers={'Authorization': self.player.token})
+    def mine(self, new_proof):
+        response = requests.post(self.base_url + '/bc/mine/',
+                                 headers={'Authorization': self.player.token, 'proof': new_proof})
         try:
             data = response.json()
-            print(data)
         except ValueError:
             print("Error:  Non-json response")
             print("Response returned:")
             print(response)
-            return response
+            return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        if  len(data.get('messages')) > 1: 
-            self.message = data.get('messages')[0]
-        new_proof = self.proof_of_work(data.get('proof'),data.get('difficulty') )
-        post_data = {"proof": new_proof}
+        self.message = data.get('messages')[0]
+        print("Response:", data)
 
-        r = requests.post(url=self.base_url + "/bc/mine",headers={'Authorization': self.player.token}, json=post_data)
-        data = r.json()
-        if data.get('message') == 'New Block Forged':
-            coins_mined += 1
-            print("Total coins mined: " + str(coins_mined))
-        else:
-            print(data.get('message'))              
+    def get_last_proof(self):
+        response = requests.post(self.base_url + '/bc/last_proof/',
+                                 headers={'Authorization': self.player.token})
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get(
+            'cooldown'), data.get('message'), data.get('errors'))
+        print("Response:", data)        
+
+    ## Timi
+    # def mine_coin(self):
+    #     coins_mined = 0
+    #     print("Starting miner")
+    #     response = requests.get(url=self.base_url + "/bc/last_proof", headers={'Authorization': self.player.token})
+    #     try:
+    #         data = response.json()
+    #         print(data)
+    #     except ValueError:
+    #         print("Error:  Non-json response")
+    #         print("Response returned:")
+    #         print(response)
+    #         return response
+    #     self.player.next_action_time = time.time() + float(data.get('cooldown'))
+    #     if  len(data.get('messages')) > 1: 
+    #         self.message = data.get('messages')[0]
+    #     new_proof = self.proof_of_work(data.get('proof'),data.get('difficulty') )
+    #     post_data = {"proof": new_proof}
+
+    #     r = requests.post(url=self.base_url + "/bc/mine",headers={'Authorization': self.player.token}, json=post_data)
+    #     data = r.json()
+    #     if data.get('message') == 'New Block Forged':
+    #         coins_mined += 1
+    #         print("Total coins mined: " + str(coins_mined))
+    #     else:
+    #         print(data.get('message'))              

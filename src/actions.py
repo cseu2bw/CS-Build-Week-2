@@ -133,7 +133,7 @@ class Actions:
 
     def change_name(self, new_name):
         response = requests.post(self.base_url + '/adv/change_name/',
-                                 headers={'Authorization': self.player.token}, json={'name': new_name})
+                                 headers={'Authorization': self.player.token}, json={'name': new_name, 'confirm': 'aye'})
         try:
             data = response.json()
         except ValueError:

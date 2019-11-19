@@ -87,8 +87,7 @@ class Player:
         print("Current items:", current_items)
   
   def sell_items(self):
-    path = self.game.find_path_to(self, self.game.shop_id)
-    self.travel_path(path)
+    self.travel_to_target(self.game.shop_id)
     self.queue_func(self.actions.check_status)
     for item in self.status.inventory:
       self.queue_func(self.actions.sell, item)
@@ -96,12 +95,14 @@ class Player:
     print("Gold:", self.status.gold)
 
   def change_name(self, name):
-    path = self.game.find_path_to(self, self.game.shrine_id)
-    self.travel_path(path)
+    self.travel_to_target(self.game.name_change_id)
     self.queue_func(self.actions.change_name, name)
     self.queue_func(self.actions.check_status)
     print("Name", self.status.name)
     
+  def get_block(self):
+    self.travel_to_target(self.game.well_id)
+    self.queue_func(self.actions.examine, 'WELL')
   def init(self):
     data = None
     response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})

@@ -169,4 +169,40 @@ class Actions:
         # replace with player status
         # self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
         print("Response:", data)
-                        
+
+    def fly(self, dir):
+        if dir not in self.current_room.exits:
+            print('Invalid direction ' + dir)
+            return
+        to_send = {'direction': dir}
+        response = requests.post(self.base_url + '/adv/fly/', headers={'Authorization': self.token}, json=to_send)
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.next_action_time = time.time() + float(data.get('cooldown'))
+        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        print("Respose:", data)                        
+
+    def dash(self, dir, num_rooms, next_room_ids):
+        if dir not in self.current_room.exits:
+            print('Invalid direction ' + dir)
+            return
+        if int(num_rooms) != len(list(next_room_ids)):
+            print(f'number of rooms do not match {num_rooms} {next_room_ids}')
+            return    
+        to_send = {'direction': dir, 'num_rooms': num_rooms, 'next_room_ids': next_room_ids}
+        response = requests.post(self.base_url + '/adv/dash/', headers={'Authorization': self.token}, json=to_send)
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.next_action_time = time.time() + float(data.get('cooldown'))
+        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        print("Respose:", data) 

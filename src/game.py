@@ -17,7 +17,7 @@ class Game:
                 for room in adj[vert].items():
                     new_path = list(path)
                     new_path.append(room)
-                    q.enqueue(new_path)
+                    queue.enqueue(new_path)
         if final_path is None:
             return
         new_path = []

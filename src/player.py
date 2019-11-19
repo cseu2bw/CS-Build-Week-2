@@ -62,6 +62,10 @@ class Player:
     if dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
   
+  def travel_path(self, path):
+    for dir in path:
+      self.travel(dir['dir'], dir['next_room'])
+
   def init(self):
     data = None
     response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})

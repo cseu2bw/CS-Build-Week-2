@@ -273,7 +273,7 @@ class Actions:
         # start at number different from 0
         proof = 20000000
         # proof = random.randint(20000000, 99999999)
-        while valid_proof(last_proof, proof, difficulty) is False:
+        while self.valid_proof(last_proof, proof, difficulty) is False:
             proof -= 1
 
         print("Proof found: " + str(proof) + " in " + str(timer() - start))

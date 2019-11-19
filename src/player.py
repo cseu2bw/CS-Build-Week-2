@@ -1,6 +1,7 @@
 import requests
 import os
 import threading
+import time
 from room import Room
 from util import Queue
 
@@ -14,17 +15,20 @@ class Player:
   def __init__(self):
     self.token = 'Token ' + token
     self.base_url = base_url
-    self.cooldown = 0
+    self.next_action_time = time.time()
     self.current_room = Room()
     self.queue = Queue()
-    self.timer = None
 
 
-  def move(self, dir):
+  def move(self, dir, id=None):
     if dir not in self.current_room.exits:
       print('Invalid direction ' + dir)
       return
-    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json={'direction': dir})
+    to_send = {'direction': dir}
+    if id is not None:
+      to_send["next_room_id"] = str(id)
+      print(f'Moving into known room {id}')
+    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json=to_send)
     try:
         data = response.json()
     except ValueError:
@@ -32,26 +36,31 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    self.cooldown = int(data.get('cooldown'))
-    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
-    print('Moved ' + dir)
-    return self.cooldown
+    self.next_action_time = time.time() + float(data.get('cooldown'))
+    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+    print("Respose:", data)
 
   def next_action(self):
+    cooldown = max(0, (self.next_action_time - time.time())) + 1
+    time.sleep(cooldown)
+    print(f"Running next action from cooldown {cooldown}")
+    self.next_action_time = time.time()
     if len(self.queue) > 0:
-      action = self.queue.pop()
+      action = self.queue.dequeue()
       args = action['args']
       kwargs = action['kwargs']
       action['func'](*args, **kwargs)
-    if len(self.queue) > 0:
-      self.timer = threading.Timer(self.cooldown, self.next_action)
-      self.timer.start()
+
 
   def queue_func(self, func, *_args, **_kwargs):
-    self.queue.push({'func': func, 'args': _args, 'kwargs': _kwargs})
+    self.queue.enqueue({'func': func, 'args': _args, 'kwargs': _kwargs})
     if len(self.queue) == 1:
-      self.timer = threading.Timer(self.cooldown, self.next_action)
-      self.timer.start()
+      self.next_action()
+
+  def travel(self, dir, id=None):
+    print(f"Trying to move {dir} to {id}")
+    if dir in ['n', 's', 'e', 'w']:
+      self.queue_func(self.move, dir, id)
   
   def init(self):
     data = None
@@ -63,12 +72,5 @@ class Player:
         print("Response returned:")
         print(response)
         return
-    self.cooldown = int(data.get('cooldown'))
-    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'))
-    return self.cooldown
-
-
-ply = Player()
-ply.init()
-ply.queue_func(ply.move,'s')
-ply.queue_func(ply.move, 's')
+    self.next_action_time = time.time() + float(data.get('cooldown'))
+    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))

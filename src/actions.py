@@ -100,6 +100,9 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.last_examine = dict()
+        self.player.last_examine['name'] = data.get('name')
+        self.player.last_examine["description"] = data.get('description')
         # self.other_player = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 

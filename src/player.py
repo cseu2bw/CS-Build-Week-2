@@ -6,6 +6,7 @@ from room import Room
 from util import Queue
 from actions import Actions
 from status import Status
+from ls8 import CPU
 
 base_url = os.environ['BASE_URL']
 token  = os.environ['TOKEN']
@@ -103,6 +104,13 @@ class Player:
   def get_block(self):
     self.travel_to_target(self.game.well_id)
     self.queue_func(self.actions.examine, 'WELL')
+    program ="#" + self.last_examine['description']
+    cpu = CPU()
+    cpu.load(program)
+    cpu.run()
+    room = int(cpu.pra_out.split(" ")[-1])
+    self.travel_to_target(room)
+    
   def init(self):
     data = None
     response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})

@@ -5,6 +5,7 @@ import time
 from room import Room
 from util import Queue
 from actions import Actions
+from status import Status
 
 base_url = os.environ['BASE_URL']
 token  = os.environ['TOKEN']
@@ -21,6 +22,7 @@ class Player:
     self.queue = Queue()
     self.game = game
     self.actions = Actions(self)
+    self.status = Status()
 
   def move(self, dir, id=None):
     if dir not in self.current_room.exits:
@@ -72,9 +74,18 @@ class Player:
     path = self.game.find_path_to(self, room_id)
     self.travel_path(path)
 
-  def collect_treasures(self):
+  def collect_treasures(self, target_items):
     visited = set()
-    
+    current_items = 0
+    while current_items < target_items:
+      path = self.game.find_closest_unvisited(self, visited)
+      self.travel_path(path)
+      visited.add(self.current_room.id)
+      if len(self.current_room.items) > 0:
+        self.queue_func(self.actions.take, self.current_room.items[0])
+        current_items += 1
+        print("Current items:", current_items)
+      
 
   def init(self):
     data = None

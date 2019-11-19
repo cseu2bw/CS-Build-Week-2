@@ -26,6 +26,16 @@ class Game:
         saved_rooms['adjacency'] = dict()
         saved_rooms['rooms'] = dict()
       self.saved_rooms = saved_rooms
+      found = 0
+      for id, room in saved_rooms['rooms'].items():
+        if room["title"] == "Shop":
+          self.shop_id = id
+          found +=1
+        if room["title"] == "Wishing Well":
+          self.well_id = id
+          found += 1
+        if found >= 2:
+          break
 
     def bfs_path(self, starting_room_id, check_func):
         adj = self.saved_rooms['adjacency']
@@ -64,7 +74,7 @@ class Game:
         return self.bfs_path(player.current_room.id, check)
 
 
-    def find_clostest_unvisited(self, player, visited):
+    def find_closest_unvisited(self, player, visited):
       def check(room_id):
         nonlocal visited
         return room_id not in visited
@@ -75,4 +85,5 @@ class Game:
 game = Game()
 player = Player(game)
 player.queue_func(player.init)
-player.travel_to_target(55)
+player.collect_treasures(5)
+# player.travel_to_target(55)

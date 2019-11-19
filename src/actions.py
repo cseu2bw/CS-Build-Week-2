@@ -302,11 +302,3 @@ class Actions:
             print("Total coins mined: " + str(coins_mined))
         else:
             print(data.get('message'))              
-
-
-newPlayer = Player()
-newPlayer.init()
-# newPlayer.move('n')
-
-new_Action = Actions(newPlayer)
-new_Action.mine_coin()

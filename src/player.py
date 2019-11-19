@@ -4,6 +4,7 @@ import threading
 import time
 from room import Room
 from util import Queue
+from actions import Actions
 
 base_url = os.environ['BASE_URL']
 token  = os.environ['TOKEN']
@@ -19,6 +20,7 @@ class Player:
     self.current_room = Room()
     self.queue = Queue()
     self.game = game
+    self.actions = Actions(self)
 
   def move(self, dir, id=None):
     if dir not in self.current_room.exits:
@@ -69,6 +71,10 @@ class Player:
   def travel_to_target(self, room_id):
     path = self.game.find_path_to(self, room_id)
     self.travel_path(path)
+
+  def collect_treasures(self):
+    visited = set()
+    
 
   def init(self):
     data = None

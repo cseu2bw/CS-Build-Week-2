@@ -45,7 +45,7 @@ class Player:
     print("Respose:", data)
 
   def next_action(self):
-    cooldown = max(0, (self.next_action_time - time.time())) + 1
+    cooldown = max(0, (self.next_action_time - time.time())) + 0.1
     time.sleep(cooldown)
     print(f"Running next action from cooldown {cooldown}")
     self.next_action_time = time.time()
@@ -85,8 +85,23 @@ class Player:
         self.queue_func(self.actions.take, self.current_room.items[0])
         current_items += 1
         print("Current items:", current_items)
-      
+  
+  def sell_items(self):
+    path = self.game.find_path_to(self, self.game.shop_id)
+    self.travel_path(path)
+    self.queue_func(self.actions.check_status)
+    for item in self.status.inventory:
+      self.queue_func(self.actions.sell, item)
+    self.queue_func(self.actions.check_status)
+    print("Gold:", self.status.gold)
 
+  def change_name(self, name):
+    path = self.game.find_path_to(self, self.game.shrine_id)
+    self.travel_path(path)
+    self.queue_func(self.actions.change_name, name)
+    self.queue_func(self.actions.check_status)
+    print("Name", self.status.name)
+    
   def init(self):
     data = None
     response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})

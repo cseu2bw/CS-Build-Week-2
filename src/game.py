@@ -34,7 +34,9 @@ class Game:
         if room["title"] == "Wishing Well":
           self.well_id = id
           found += 1
-        if found >= 2:
+        if room["title"] == "Linh's Shrine":
+          self.shrine_id = id
+        if found >= 3:
           break
 
     def bfs_path(self, starting_room_id, check_func):
@@ -85,5 +87,6 @@ class Game:
 game = Game()
 player = Player(game)
 player.queue_func(player.init)
-player.collect_treasures(5)
+player.collect_treasures(8)
+player.sell_items()
 # player.travel_to_target(55)

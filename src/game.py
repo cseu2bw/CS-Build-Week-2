@@ -1,34 +1,39 @@
 from util import Stack, Queue
 from player import Player
 import os
+import json
 
 dir = os.path.dirname(__file__)
 rooms_file = os.path.join(dir, '../rooms.json')
-
-import json
-
-saved_rooms = dict()
-try:
-  with open(rooms_file) as json_file:
-      saved_rooms = json.load(json_file)
-  temp_adj = dict()
-  temp_rooms = dict()
-  for key, value in saved_rooms['adjacency'].items():
-    temp_adj[int(key)] = value
-  saved_rooms['adjacency'] = temp_adj
-  for key, value in saved_rooms['rooms'].items():
-    temp_rooms[int(key)] = value
-  saved_rooms['rooms'] = temp_rooms
-except:
-  saved_rooms['adjacency'] = dict()
-  saved_rooms['rooms'] = dict()
 
 player = Player()
 player.queue_func(player.init)
 
 
 class Game:
-    def find_path_to(self, starting_room_id, target_id, adj):
+    def __init__(self):
+      self.load_rooms()
+      sel
+    def load_rooms(self):
+      saved_rooms = dict()
+      try:
+        with open(rooms_file) as json_file:
+            saved_rooms = json.load(json_file)
+        temp_adj = dict()
+        temp_rooms = dict()
+        for key, value in saved_rooms['adjacency'].items():
+          temp_adj[int(key)] = value
+        saved_rooms['adjacency'] = temp_adj
+        for key, value in saved_rooms['rooms'].items():
+          temp_rooms[int(key)] = value
+        saved_rooms['rooms'] = temp_rooms
+      except:
+        saved_rooms['adjacency'] = dict()
+        saved_rooms['rooms'] = dict()
+      self.saved_rooms = saved_rooms
+    def find_path_to(self, player, target_id):
+        starting_room_id = player.current_room.id
+        adj = self.saved_rooms['adjacency']
         queue = Queue()
         final_path = None
         visited = set()
@@ -58,5 +63,5 @@ class Game:
 
 
 game = Game()
-path = game.find_path_to(player.current_room.id, 55, saved_rooms['adjacency'])
+path = game.find_path_to(player, 55)
 player.travel_path(path)

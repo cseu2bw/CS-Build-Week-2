@@ -19,6 +19,7 @@ class Actions:
         self.next_action_time = time.time()
         self.current_room = Room()
         self.queue = Queue()
+        self.message = ''
 
     def take(self, item):
         response = requests.post(self.base_url + '/adv/take/',
@@ -205,4 +206,63 @@ class Actions:
             return
         self.next_action_time = time.time() + float(data.get('cooldown'))
         self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
-        print("Respose:", data) 
+        print("Respose:", data)
+
+    def carry(self, item):
+        response = requests.post(self.base_url + '/adv/carry/',
+                                 headers={'Authorization': self.token}, json={'name': item})
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.next_action_time = time.time() + float(data.get('cooldown'))
+        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get(
+            'description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        print("Response:", data)      
+
+    def receive(self):
+        response = requests.post(self.base_url + '/adv/receive/',
+                                 headers={'Authorization': self.token})
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.next_action_time = time.time() + float(data.get('cooldown'))
+        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get(
+            'description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        print("Response:", data)    
+
+    def get_balance(self, item):
+        response = requests.post(self.base_url + '/adv/get_balance/',
+                                 headers={'Authorization': self.token})
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.next_action_time = time.time() + float(data.get('cooldown'))
+        self.message = data.get('cooldown')[0]
+        print("Response:", data)
+
+    def transmogrify(self, item):
+        response = requests.post(self.base_url + '/adv/transmogrify/',
+                                 headers={'Authorization': self.token}, json={'name': item})
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.next_action_time = time.time() + float(data.get('cooldown'))
+        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get(
+            'description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        print("Response:", data)                       

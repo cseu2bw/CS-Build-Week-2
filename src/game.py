@@ -41,7 +41,7 @@ class Game:
                    final_path = path
                    break
                 visited.add(vert)
-                for room in adj[vert].items():
+                for room in adj[vert].values():
                     new_path = list(path)
                     new_path.append(room)
                     queue.enqueue(new_path)

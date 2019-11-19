@@ -4,6 +4,7 @@ import threading
 import time
 from room import Room
 from util import Queue
+from status import Status
 
 base_url = os.environ['BASE_URL']
 token = os.environ['TOKEN']
@@ -20,6 +21,8 @@ class Actions:
         self.current_room = Room()
         self.queue = Queue()
         self.message = ''
+        self.status = Status()
+        # self.other_player = Status()
 
     def take(self, item):
         response = requests.post(self.base_url + '/adv/take/',
@@ -92,8 +95,7 @@ class Actions:
             print(response)
             return
         self.next_action_time = time.time() + float(data.get('cooldown'))
-        # replace with player status
-        # self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def examine(self, item_or_player):
@@ -107,8 +109,7 @@ class Actions:
             print(response)
             return
         self.next_action_time = time.time() + float(data.get('cooldown'))
-        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get(
-            'description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        # self.other_player = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def wear(self, item):
@@ -122,8 +123,7 @@ class Actions:
             print(response)
             return
         self.next_action_time = time.time() + float(data.get('cooldown'))
-        # replace with player status
-        # self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def undress(self, item):
@@ -137,8 +137,7 @@ class Actions:
             print(response)
             return
         self.next_action_time = time.time() + float(data.get('cooldown'))
-        # replace with player status
-        # self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def change_name(self, new_name):
@@ -152,8 +151,7 @@ class Actions:
             print(response)
             return
         self.next_action_time = time.time() + float(data.get('cooldown'))
-        # replace with player status
-        # self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def pray(self):
@@ -167,8 +165,7 @@ class Actions:
             print(response)
             return
         self.next_action_time = time.time() + float(data.get('cooldown'))
-        # replace with player status
-        # self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
         print("Response:", data)
 
     def fly(self, dir):

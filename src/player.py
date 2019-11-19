@@ -12,13 +12,13 @@ if token == '' or token is None:
   print('Invalid token')
 
 class Player:
-  def __init__(self):
+  def __init__(self, game=None):
     self.token = 'Token ' + token
     self.base_url = base_url
     self.next_action_time = time.time()
     self.current_room = Room()
     self.queue = Queue()
-
+    self.game = game
 
   def move(self, dir, id=None):
     if dir not in self.current_room.exits:
@@ -65,6 +65,10 @@ class Player:
   def travel_path(self, path):
     for dir in path:
       self.travel(dir['dir'], dir['next_room'])
+
+  def travel_to_target(self, room_id):
+    path = self.game.find_path_to(self, room_id)
+    self.travel_path(path)
 
   def init(self):
     data = None

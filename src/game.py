@@ -6,10 +6,6 @@ import json
 dir = os.path.dirname(__file__)
 rooms_file = os.path.join(dir, '../rooms.json')
 
-player = Player()
-player.queue_func(player.init)
-
-
 class Game:
     def __init__(self):
       self.load_rooms()
@@ -30,6 +26,7 @@ class Game:
         saved_rooms['adjacency'] = dict()
         saved_rooms['rooms'] = dict()
       self.saved_rooms = saved_rooms
+
     def find_path_to(self, player, target_id):
         starting_room_id = player.current_room.id
         adj = self.saved_rooms['adjacency']
@@ -62,5 +59,6 @@ class Game:
 
 
 game = Game()
-path = game.find_path_to(player, 55)
-player.travel_path(path)
+player = Player(game)
+player.queue_func(player.init)
+player.travel_to_target(55)

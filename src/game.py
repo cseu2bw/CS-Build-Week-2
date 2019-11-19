@@ -13,7 +13,6 @@ player.queue_func(player.init)
 class Game:
     def __init__(self):
       self.load_rooms()
-      sel
     def load_rooms(self):
       saved_rooms = dict()
       try:

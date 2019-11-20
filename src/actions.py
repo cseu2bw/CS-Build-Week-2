@@ -18,6 +18,7 @@ class Actions:
         self.base_url = base_url
         self.message = ''
         self.last_proof = Proof()
+        self.new_proof = 0
         # self.other_player = Status()
 
     def take(self, item):
@@ -277,7 +278,7 @@ class Actions:
             proof -= 1
 
         print("Proof found: " + str(proof) + " in " + str(timer() - start))
-        return proof    
+        self.new_proof = proof   
 
     def valid_proof(self, last_proof, proof, difficulty):
         # stringify and encode the supposed proof answer
@@ -287,11 +288,11 @@ class Actions:
         # Does hash(last_proof, proof) contain N leading zeroes, where N is the current difficulty level?
         # print(guess_hash)
         # hardcoded with difficulty 6
-        return guess_hash[:difficulty] == '000000'
+        return guess_hash[:difficulty] == '0' * difficulty
 
     def mine(self, new_proof):
         response = requests.post(self.base_url + '/bc/mine/',
-                                 headers={'Authorization': self.player.token, 'proof': int(new_proof)})
+                                 headers={'Authorization': self.player.token}, json={'proof': int(new_proof)})
         try:
             data = response.json()
         except ValueError:
@@ -299,7 +300,7 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        # self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
         # self.message = data.get('messages')[0]
         print("Response:", data)
 
@@ -313,7 +314,7 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        # self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
         self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get(
             'cooldown'), data.get('message'), data.get('errors'))
         print("Response:", data)        

@@ -110,6 +110,10 @@ class Player:
     cpu.run()
     room = int(cpu.pra_out.split(" ")[-1])
     self.travel_to_target(room)
+    self.queue_func(self.actions.get_last_proof)
+    self.queue_func(self.actions.proof_of_work, 
+        self.actions.last_proof.proof, self.actions.last_proof.difficulty)
+    self.queue_func(self.actions.mine, self.actions.new_proof)
     
   def init(self):
     data = None

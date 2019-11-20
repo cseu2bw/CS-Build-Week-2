@@ -16,5 +16,8 @@ if player.status.name != name:
     player.sell_items()
   player.change_name(name)
 
-while True:
-  player.go_next_block()
+# while True:
+#   player.go_next_block()
+
+player.get_dash()
+player.get_flight()

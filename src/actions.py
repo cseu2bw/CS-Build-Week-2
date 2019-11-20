@@ -18,6 +18,7 @@ class Actions:
         self.base_url = base_url
         self.message = ''
         self.last_proof = Proof()
+        self.new_proof = 0
         # self.other_player = Status()
 
     def take(self, item):
@@ -167,11 +168,14 @@ class Actions:
         self.player.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
         print("Response:", data)
 
-    def fly(self, dir):
+    def fly(self, dir, id=None):
         if dir not in self.player.current_room.exits:
             print('Invalid direction ' + dir)
             return
         to_send = {'direction': dir}
+        if id is not None:
+            to_send["next_room_id"] = str(id)
+            print(f'Flying into known room {id}')
         response = requests.post(self.base_url + '/adv/fly/', headers={'Authorization': self.player.token}, json=to_send)
         try:
             data = response.json()
@@ -188,9 +192,9 @@ class Actions:
         if dir not in self.player.current_room.exits:
             print('Invalid direction ' + dir)
             return
-        if int(num_rooms) != len(list(next_room_ids)):
-            print(f'number of rooms do not match {num_rooms} {next_room_ids}')
-            return    
+        # if int(num_rooms) != len(list(next_room_ids)):
+        #     print(f'number of rooms do not match {num_rooms} {next_room_ids}')
+        #     return    
         to_send = {'direction': dir, 'num_rooms': num_rooms, 'next_room_ids': next_room_ids}
         response = requests.post(self.base_url + '/adv/dash/', headers={'Authorization': self.player.token}, json=to_send)
         try:
@@ -277,7 +281,7 @@ class Actions:
             proof -= 1
 
         print("Proof found: " + str(proof) + " in " + str(timer() - start))
-        return proof    
+        self.new_proof = proof   
 
     def valid_proof(self, last_proof, proof, difficulty):
         # stringify and encode the supposed proof answer
@@ -287,11 +291,11 @@ class Actions:
         # Does hash(last_proof, proof) contain N leading zeroes, where N is the current difficulty level?
         # print(guess_hash)
         # hardcoded with difficulty 6
-        return guess_hash[:difficulty] == '000000'
+        return guess_hash[:difficulty] == '0' * difficulty
 
     def mine(self, new_proof):
         response = requests.post(self.base_url + '/bc/mine/',
-                                 headers={'Authorization': self.player.token, 'proof': int(new_proof)})
+                                 headers={'Authorization': self.player.token}, json={'proof': int(new_proof)})
         try:
             data = response.json()
         except ValueError:
@@ -299,7 +303,7 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        # self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
         # self.message = data.get('messages')[0]
         print("Response:", data)
 
@@ -313,7 +317,7 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        # self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
         self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get(
             'cooldown'), data.get('message'), data.get('errors'))
         print("Response:", data)        

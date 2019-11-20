@@ -24,6 +24,8 @@ class Player:
     self.game = game
     self.actions = Actions(self)
     self.status = Status()
+    self.has_dash = False if os.environ['HAS_DASH'] == 'False' else True
+    self.has_flight = False if os.environ['HAS_FLIGHT'] == 'False' else True
 
   def move(self, dir, id=None):
     if dir not in self.current_room.exits:
@@ -64,12 +66,38 @@ class Player:
 
   def travel(self, dir, id=None):
     print(f"Trying to move {dir} to {id}")
-    if dir in ['n', 's', 'e', 'w']:
+    if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
+      self.queue_func(self.actions.fly, dir, id)
+      print(f"Flew in direction {dir}")
+    elif dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
   
   def travel_path(self, path):
+    dashes = self.get_path_dashes(path)
+    print(dashes)
+    i = 0
+    while i < len(path):
+      dir = path[i]
+      if self.has_dash and str(dir['next_room']) in dashes:
+        dash = dashes[str(dir['next_room'])]
+        self.dash(dash['dir'], dash['rooms'])
+        i += len(dash['rooms'])
+      else:
+        i += 1
+        self.travel(dir['dir'], dir['next_room'])
+
+  def get_path_dashes(self, path):
+    current_dir = None
+    rooms = list()
+    dashes = dict()
     for dir in path:
-      self.travel(dir['dir'], dir['next_room'])
+      if dir['dir'] != current_dir:
+        if len(rooms) > 2:
+          dashes[rooms[0]] = {'dir': current_dir, 'rooms': rooms}
+        current_dir = dir['dir']
+        rooms = list()
+      rooms.append(str(dir['next_room']))
+    return dashes
 
   def travel_to_target(self, room_id):
     path = self.game.find_path_to(self, room_id)
@@ -83,9 +111,25 @@ class Player:
       self.travel_path(path)
       visited.add(self.current_room.id)
       if len(self.current_room.items) > 0:
-        self.queue_func(self.actions.take, self.current_room.items[0])
-        current_items += 1
-        print("Current items:", current_items)
+        for item in self.current_room.items:
+          self.queue_func(self.actions.take, item)
+          current_items += 1
+          print("Current items:", current_items)
+
+  def get_dash(self):
+    self.travel_to_target(self.game.dash_shrine_id)
+    self.queue_func(self.actions.pray)
+    self.has_dash = True
+
+  def get_flight(self):
+    self.travel_to_target(self.game.flight_shrine_id)
+    self.queue_func(self.actions.pray)
+    self.has_flight = True
+
+  def dash(self, dir, rooms):
+    delimiter = ','
+    room_str = delimiter.join(rooms)
+    self.queue_func(self.actions.dash, dir, str(len(rooms)), room_str)
   
   def sell_items(self):
     self.travel_to_target(self.game.shop_id)
@@ -110,6 +154,10 @@ class Player:
     cpu.run()
     room = int(cpu.pra_out.split(" ")[-1])
     self.travel_to_target(room)
+    self.queue_func(self.actions.get_last_proof)
+    self.queue_func(self.actions.proof_of_work, 
+        self.actions.last_proof.proof, self.actions.last_proof.difficulty)
+    self.queue_func(self.actions.mine, self.actions.new_proof)
     
   def init(self):
     data = None

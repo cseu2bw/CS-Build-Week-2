@@ -41,7 +41,10 @@ class Game:
         if room["title"] == "Pirate Ry's":
           self.name_change_id = id
           found += 1
-        if found >= 4:
+        if room["title"] == "The Peak of Mt. Holloway":
+          self.flight_shrine_id = id
+          found += 1
+        if found >= 5:
           break
 
     def bfs_path(self, starting_room_id, check_func):
@@ -88,11 +91,6 @@ class Game:
       
       return self.bfs_path(player.current_room.id, check)
 
-
-game = Game()
-player = Player(game)
-player.queue_func(player.init)
-player.go_next_block()
 # player.travel_to_target(55)
 # cpu = CPU()
 

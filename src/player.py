@@ -123,3 +123,8 @@ class Player:
         return
     self.next_action_time = time.time() + float(data.get('cooldown'))
     self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+
+
+timi = Player()
+timi.init()
+timi.move('s')

@@ -2,7 +2,6 @@ import requests
 import os
 import threading
 import time
-from player import Player
 from room import Room
 from util import Queue
 from status import Status
@@ -17,7 +16,6 @@ class Actions:
         self.player = player
         self.base_url = base_url
         self.message = ''
-        self.status = Status()
         # self.other_player = Status()
 
     def take(self, item):
@@ -91,7 +89,7 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def examine(self, item_or_player):
@@ -105,6 +103,9 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.last_examine = dict()
+        self.player.last_examine['name'] = data.get('name')
+        self.player.last_examine["description"] = data.get('description')
         # self.other_player = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
@@ -119,7 +120,7 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def undress(self, item):
@@ -133,12 +134,12 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def change_name(self, new_name):
         response = requests.post(self.base_url + '/adv/change_name/',
-                                 headers={'Authorization': self.player.token}, json={'name': new_name})
+                                 headers={'Authorization': self.player.token}, json={'name': new_name, 'confirm': 'aye'})
         try:
             data = response.json()
         except ValueError:
@@ -147,7 +148,7 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def pray(self):

@@ -15,4 +15,6 @@ if player.status.name != name:
     player.collect_treasures(target_items)
     player.sell_items()
   player.change_name(name)
-player.go_next_block()
+
+while True:
+  player.go_next_block()

@@ -20,4 +20,4 @@ if not player.has_flight:
 if not player.has_dash:
   player.get_dash()
 while True:
-  player.get_next_block()
+  player.go_next_block()

@@ -60,6 +60,28 @@ class CPU:
                 self.fl = 0b001
             elif a > b:
                 self.fl = 0b010
+        elif op == "AND":
+            self.reg[reg_a] = self.reg[reg_a] & self.reg[reg_b]
+        elif op == "OR":
+            self.reg[reg_a] = self.reg[reg_a] | self.reg[reg_b]
+        elif op == "XOR":
+            self.reg[reg_a] = self.reg[reg_a] ^ self.reg[reg_b]
+        elif op == "NOT":
+            self.reg[reg_a] = ~self.reg[reg_a]
+        elif op == "SHL":
+            self.reg[reg_a] = self.reg[reg_a] << self.reg[reg_b]
+        elif op == "SHR":
+            self.reg[reg_a] = self.reg[reg_a] >> self.reg[reg_b]
+        elif op == "MOD":
+            self.reg[reg_a] = self.reg[reg_a] % self.reg[reg_b]
+        elif op == "DIV":
+            if self.reg[reg_b] == 0:
+                raise Exception("Cannot divide by zero")
+            self.reg[reg_a] = self.reg[reg_a] / self.reg[reg_b]
+        elif op == "DEC":
+            self.reg[reg_a] -= 1
+        elif op == "SUB":
+            self.reg[reg_a] -= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -143,7 +165,17 @@ class CPU:
         ALU_OPS = {
             0b0010: "MUL",
             0b0111: "CMP",
-            0b0000: "ADD"
+            0b0000: "ADD",
+            0b1000: "AND",
+            0b1010: "OR",
+            0b1011: "XOR",
+            0b1001: "NOT",
+            0b1100: "SHL",
+            0b1101: "SHR",
+            0b0100: "MOD",
+            0b0011: "DIV",
+            0b0110: "DEC",
+            0b0001: "SUB"
         }
 
         SPC_OPS = {
@@ -236,7 +268,7 @@ class CPU:
                     registers = self.get_registers(1, 2)
                     if not registers:
                         return False
-                    self.alu(ALU_OPS[OPCODE], registers[0], registers[1])
+                    self.alu(ALU_OPS[OPCODE], registers[0], registers[OPERANDS - 1])
                 elif not OPCODE_to_operation(self, OPCODE):
                     running = False
                     break

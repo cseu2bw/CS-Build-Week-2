@@ -92,7 +92,7 @@ class Game:
 game = Game()
 player = Player(game)
 player.queue_func(player.init)
-player.get_block()
+player.go_next_block()
 # player.travel_to_target(55)
 # cpu = CPU()
 
@@ -100,7 +100,6 @@ player.get_block()
 # cpu.load(bin_in)
 # cpu.run()
 # room = int(cpu.pra_out.split(" ")[-1])
-# print(room)
 # bins = bin_in.split('\n')
 # result = ""
 # for b in bins:

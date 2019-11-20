@@ -83,9 +83,10 @@ class Player:
       self.travel_path(path)
       visited.add(self.current_room.id)
       if len(self.current_room.items) > 0:
-        self.queue_func(self.actions.take, self.current_room.items[0])
-        current_items += 1
-        print("Current items:", current_items)
+        for item in self.current_room.items:
+          self.queue_func(self.actions.take, item)
+          current_items += 1
+          print("Current items:", current_items)
   
   def sell_items(self):
     self.travel_to_target(self.game.shop_id)

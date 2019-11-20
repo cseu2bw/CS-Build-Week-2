@@ -68,8 +68,27 @@ class Player:
       self.queue_func(self.move, dir, id)
   
   def travel_path(self, path):
+    dashes = self.get_path_dashes(path)
+    print(dashes)
     for dir in path:
-      self.travel(dir['dir'], dir['next_room'])
+      if dir['next_room'] in dashes:
+        dash = dashes[dir['next_room']]
+        self.dash(dash['dir'], dash['rooms'])
+      else:
+        self.travel(dir['dir'], dir['next_room'])
+
+  def get_path_dashes(self, path):
+    current_dir = None
+    rooms = list()
+    dashes = dict()
+    for dir in path:
+      if dir['dir'] != current_dir:
+        if len(rooms) > 2:
+          dashes[rooms[0]] = {'dir': current_dir, 'rooms': rooms}
+        current_dir = dir['dir']
+        rooms = list()
+      rooms.append(dir['next_room'])
+    return dashes
 
   def travel_to_target(self, room_id):
     path = self.game.find_path_to(self, room_id)
@@ -95,6 +114,11 @@ class Player:
   def get_flight(self):
     self.travel_to_target(self.game.flight_shrine_id)
     self.queue_func(self.actions.pray)
+
+  def dash(self, dir, rooms):
+    delimiter = ','
+    room_str = delimiter.join(rooms)
+    self.queue_func(self.actions.dash, str(len(rooms)), room_str)
   
   def sell_items(self):
     self.travel_to_target(self.game.shop_id)

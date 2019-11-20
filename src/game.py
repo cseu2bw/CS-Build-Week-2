@@ -88,11 +88,6 @@ class Game:
       
       return self.bfs_path(player.current_room.id, check)
 
-
-game = Game()
-player = Player(game)
-player.queue_func(player.init)
-player.go_next_block()
 # player.travel_to_target(55)
 # cpu = CPU()
 

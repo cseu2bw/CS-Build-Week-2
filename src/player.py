@@ -24,8 +24,8 @@ class Player:
     self.game = game
     self.actions = Actions(self)
     self.status = Status()
-    self.has_dash = os.environ['HAS_DASH']
-    self.has_flight = os.environ['HAS_FLIGHT']
+    self.has_dash = False if os.environ['HAS_DASH'] == 'False' else True
+    self.has_flight = False if os.environ['HAS_FLIGHT'] == 'False' else True
 
   def move(self, dir, id=None):
     if dir not in self.current_room.exits:

@@ -15,5 +15,9 @@ if player.status.name != name:
     player.collect_treasures(target_items)
     player.sell_items()
   player.change_name(name)
-
+print(type(player.has_dash))
+print(type(player.has_flight))
 player.get_flight()
+player.get_dash()
+while True:
+  player.get_next_block()

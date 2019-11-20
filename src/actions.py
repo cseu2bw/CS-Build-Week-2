@@ -189,9 +189,9 @@ class Actions:
         if dir not in self.player.current_room.exits:
             print('Invalid direction ' + dir)
             return
-        if int(num_rooms) != len(list(next_room_ids)):
-            print(f'number of rooms do not match {num_rooms} {next_room_ids}')
-            return    
+        # if int(num_rooms) != len(list(next_room_ids)):
+        #     print(f'number of rooms do not match {num_rooms} {next_room_ids}')
+        #     return    
         to_send = {'direction': dir, 'num_rooms': num_rooms, 'next_room_ids': next_room_ids}
         response = requests.post(self.base_url + '/adv/dash/', headers={'Authorization': self.player.token}, json=to_send)
         try:

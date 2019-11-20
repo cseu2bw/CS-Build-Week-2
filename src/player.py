@@ -24,6 +24,8 @@ class Player:
     self.game = game
     self.actions = Actions(self)
     self.status = Status()
+    self.has_dash = os.environ['HAS_DASH']
+    self.has_flight = os.environ['HAS_FLIGHT']
 
   def move(self, dir, id=None):
     if dir not in self.current_room.exits:
@@ -70,11 +72,15 @@ class Player:
   def travel_path(self, path):
     dashes = self.get_path_dashes(path)
     print(dashes)
-    for dir in path:
-      if dir['next_room'] in dashes:
-        dash = dashes[dir['next_room']]
+    i = 0
+    while i < len(path):
+      dir = path[i]
+      if str(dir['next_room']) in dashes:
+        dash = dashes[str(dir['next_room'])]
         self.dash(dash['dir'], dash['rooms'])
+        i += len(dash['rooms'])
       else:
+        i += 1
         self.travel(dir['dir'], dir['next_room'])
 
   def get_path_dashes(self, path):
@@ -87,7 +93,7 @@ class Player:
           dashes[rooms[0]] = {'dir': current_dir, 'rooms': rooms}
         current_dir = dir['dir']
         rooms = list()
-      rooms.append(dir['next_room'])
+      rooms.append(str(dir['next_room']))
     return dashes
 
   def travel_to_target(self, room_id):
@@ -118,7 +124,7 @@ class Player:
   def dash(self, dir, rooms):
     delimiter = ','
     room_str = delimiter.join(rooms)
-    self.queue_func(self.actions.dash, str(len(rooms)), room_str)
+    self.queue_func(self.actions.dash, dir, str(len(rooms)), room_str)
   
   def sell_items(self):
     self.travel_to_target(self.game.shop_id)

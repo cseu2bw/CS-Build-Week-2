@@ -87,6 +87,14 @@ class Player:
           self.queue_func(self.actions.take, item)
           current_items += 1
           print("Current items:", current_items)
+
+  def get_dash(self):
+    self.travel_to_target(self.game.dash_shrine_id)
+    self.queue_func(self.actions.pray)
+
+  def get_flight(self):
+    self.travel_to_target(self.game.flight_shrine_id)
+    self.queue_func(self.actions.pray)
   
   def sell_items(self):
     self.travel_to_target(self.game.shop_id)

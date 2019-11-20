@@ -66,7 +66,10 @@ class Player:
 
   def travel(self, dir, id=None):
     print(f"Trying to move {dir} to {id}")
-    if dir in ['n', 's', 'e', 'w']:
+    if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
+      self.queue_func(self.actions.fly, dir)
+      print(f"Flew in direction {dir}")
+    elif dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
   
   def travel_path(self, path):
@@ -75,7 +78,7 @@ class Player:
     i = 0
     while i < len(path):
       dir = path[i]
-      if str(dir['next_room']) in dashes:
+      if self.has_dash and str(dir['next_room']) in dashes:
         dash = dashes[str(dir['next_room'])]
         self.dash(dash['dir'], dash['rooms'])
         i += len(dash['rooms'])
@@ -116,10 +119,12 @@ class Player:
   def get_dash(self):
     self.travel_to_target(self.game.dash_shrine_id)
     self.queue_func(self.actions.pray)
+    self.has_dash = True
 
   def get_flight(self):
     self.travel_to_target(self.game.flight_shrine_id)
     self.queue_func(self.actions.pray)
+    self.has_flight = True
 
   def dash(self, dir, rooms):
     delimiter = ','

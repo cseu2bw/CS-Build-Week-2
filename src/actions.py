@@ -168,11 +168,14 @@ class Actions:
         self.player.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
         print("Response:", data)
 
-    def fly(self, dir):
+    def fly(self, dir, id=None):
         if dir not in self.player.current_room.exits:
             print('Invalid direction ' + dir)
             return
         to_send = {'direction': dir}
+        if id is not None:
+            to_send["next_room_id"] = str(id)
+            print(f'Flying into known room {id}')
         response = requests.post(self.base_url + '/adv/fly/', headers={'Authorization': self.player.token}, json=to_send)
         try:
             data = response.json()

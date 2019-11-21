@@ -140,14 +140,4 @@ class Player:
     self.queue_func(self.actions.mine, self.actions.new_proof)
     
   def init(self):
-    data = None
-    response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})
-    try:
-        data = response.json()
-    except ValueError:
-        print("Error:  Non-json response")
-        print("Response returned:")
-        print(response)
-        return
-    self.next_action_time = time.time() + float(data.get('cooldown'))
-    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+    self.queue_func(self.actions.init)

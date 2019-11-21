@@ -10,6 +10,8 @@ except:
 
 game = Game()
 player = Player(game)
+player.queue_func(player.init)
+
 if player.status.name != name:
   target_items = int(math.ceil(((1000 - player.status.gold) / 100)))
   if target_items > 0:

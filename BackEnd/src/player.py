@@ -45,7 +45,7 @@ class Player:
         return
     self.next_action_time = time.time() + float(data.get('cooldown'))
     self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
-    print("Respose:", data)
+    print("Response:", data)
 
   def next_action(self):
     cooldown = max(0, (self.next_action_time - time.time())) + 0.1

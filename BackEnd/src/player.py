@@ -48,7 +48,7 @@ class Player:
     print("Respose:", data)
 
   def next_action(self):
-    cooldown = max(0, (self.next_action_time - time.time())) + 0.1
+    cooldown = max(0, (self.next_action_time - time.time())) + 0.01
     time.sleep(cooldown)
     print(f"Running next action from cooldown {cooldown}")
     self.next_action_time = time.time()
@@ -71,6 +71,11 @@ class Player:
       print(f"Flew in direction {dir}")
     elif dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
+
+  # def travel(self, dir, id=None):
+  #   print(f"Trying to move {dir} to {id}")
+  #   if dir in ['n', 's', 'e', 'w']:
+  #     self.queue_func(self.move, dir, id)
   
   def travel_path(self, path):
     dashes = self.get_path_dashes(path)
@@ -101,6 +106,7 @@ class Player:
 
   def travel_to_target(self, room_id):
     path = self.game.find_path_to(self, room_id)
+    print(path)
     self.travel_path(path)
 
   def collect_treasures(self, target_items):
@@ -115,6 +121,28 @@ class Player:
           self.queue_func(self.actions.take, item)
           current_items += 1
           print("Current items:", current_items)
+
+  def collect_snitches(self, target_items):
+    visited = set()
+    current_items = 0
+    while current_items < target_items:
+      path = self.game.find_closest_unvisited(self, visited)
+      self.travel_path(path)
+      visited.add(self.current_room.id)
+      print(f'rooms visited since last found: {len(visited)}')
+      if len(self.current_room.items) > 0:
+        for item in self.current_room.items:
+            if item == 'golden snitch':
+                self.queue_func(self.actions.take, item)
+                current_items += 1
+                print("Current items:", current_items)
+                print('You found another one!!!')
+                print('You found another one!')
+                print('You found another one!')
+                print('You found another one!')
+                print('You found another one!')
+                print('You found another one!')
+                visited = set()          
 
   def get_dash(self):
     self.travel_to_target(self.game.dash_shrine_id)
@@ -158,6 +186,22 @@ class Player:
     self.queue_func(self.actions.proof_of_work, 
         self.actions.last_proof.proof, self.actions.last_proof.difficulty)
     self.queue_func(self.actions.mine, self.actions.new_proof)
+
+  def go_next_block_warped(self):
+    self.travel_to_target(self.game.well_id)
+    self.queue_func(self.actions.examine, 'WELL')
+    program ="#" + self.last_examine['description']
+    cpu = CPU()
+    cpu.load(program)
+    cpu.run()
+    room = int(cpu.pra_out.split(" ")[-1])
+    print(f'The golden snitch is in room {room}')
+    self.travel_to_target(room)
+    self.queue_func(self.actions.take, 'golden snitch')
+    # self.queue_func(self.actions.get_last_proof)
+    # self.queue_func(self.actions.proof_of_work, 
+    #     self.actions.last_proof.proof, self.actions.last_proof.difficulty)
+    # self.queue_func(self.actions.mine, self.actions.new_proof)    
     
   def init(self):
     data = None

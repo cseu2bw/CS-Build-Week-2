@@ -50,7 +50,7 @@ class Player:
       self.queue_func(self.actions.fly, dir, id)
       print(f"Flew in direction {dir}")
     elif dir in ['n', 's', 'e', 'w']:
-      self.queue_func(self.move, dir, id)
+      self.queue_func(self.actions.move, dir, id)
   
   def travel_path(self, path):
     dashes = self.get_path_dashes(path)

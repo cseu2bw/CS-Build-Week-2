@@ -142,7 +142,6 @@ class Actions:
         self.player.last_examine = dict()
         self.player.last_examine['name'] = data.get('name')
         self.player.last_examine["description"] = data.get('description')
-        # self.other_player = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
         print("Response:", data)
 
     def wear(self, item):
@@ -298,15 +297,11 @@ class Actions:
         print("Response:", data)
 
     def proof_of_work(self, last_proof, difficulty):
-
         start = timer()
-
         print("Searching for next proof")
         print(last_proof)
 
-        # start at number different from 0
-        proof = 20000000
-        # proof = random.randint(20000000, 99999999)
+        proof = 100000000
         while self.valid_proof(last_proof, proof, difficulty) is False:
             proof -= 1
 
@@ -314,13 +309,8 @@ class Actions:
         self.new_proof = proof   
 
     def valid_proof(self, last_proof, proof, difficulty):
-        # stringify and encode the supposed proof answer
         guess = f'{last_proof}{proof}'.encode()
-        # hash the supposed proof
         guess_hash = hashlib.sha256(guess).hexdigest()
-        # Does hash(last_proof, proof) contain N leading zeroes, where N is the current difficulty level?
-        # print(guess_hash)
-        # hardcoded with difficulty 6
         return guess_hash[:difficulty] == '0' * difficulty
 
     def mine(self, new_proof):

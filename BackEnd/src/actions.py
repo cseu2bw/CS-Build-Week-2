@@ -126,7 +126,7 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'))
+        self.player.status = Status(data.get('name'), data.get('cooldown'), data.get('encumbrance'), data.get('strength'), data.get('speed'), data.get('gold'), data.get('bodywear'), data.get('footwear'), data.get('inventory'), data.get('status'), data.get('errors'), data.get('messages'), data.get('abilities'))
         print("Response:", data)
 
     def examine(self, item_or_player):

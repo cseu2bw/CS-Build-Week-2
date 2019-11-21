@@ -24,6 +24,7 @@ class Player:
     self.game = game
     self.actions = Actions(self)
     self.status = Status()
+    self.init()
     self.has_dash = False if os.environ['HAS_DASH'] == 'False' else True
     self.has_flight = False if os.environ['HAS_FLIGHT'] == 'False' else True
     

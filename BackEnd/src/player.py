@@ -28,8 +28,8 @@ class Player:
     self.actions = Actions(self)
     self.status = Status()
     self.init()
-    self.has_dash = False
-    self.has_flight = False
+    self.has_dash = True
+    self.has_flight = True
     self.last_examine = dict()
     
   def next_action(self):
@@ -161,4 +161,4 @@ class Player:
     self.queue_func(self.actions.init)
     self.queue_func(self.actions.check_status) # To check if we have abilities
     self.has_dash = 'dash' in self.status.abilities
-    self.has_fly = 'fly' in self.status.abilities
+    self.has_flight = 'fly' in self.status.abilities

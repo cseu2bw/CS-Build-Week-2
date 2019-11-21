@@ -28,5 +28,6 @@ player = Player(game)
 # player.queue_func(player.travel_to_target, 555)
 # player.travel("n")
 # player.queue_func(player.actions.warp)
+
 while True:
   player.get_next_snitch()

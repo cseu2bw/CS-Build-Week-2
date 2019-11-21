@@ -5,7 +5,7 @@ import json
 from ls8 import CPU
 
 dir = os.path.dirname(__file__)
-# rooms_file = os.path.join(dir, '../rooms.json')
+#rooms_file = os.path.join(dir, '../rooms.json')
 rooms_file = os.path.join(dir, '../warped.json')
 
 class Game:

@@ -142,3 +142,4 @@ class Player:
     
   def init(self):
     self.queue_func(self.actions.init)
+    self.queue_func(self.actions.check_status)

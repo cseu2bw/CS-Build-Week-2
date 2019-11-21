@@ -29,7 +29,7 @@ class Actions:
         if id is not None:
         to_send["next_room_id"] = str(id)
         print(f'Moving into known room {id}')
-        response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json=to_send)
+        response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.player.token}, json=to_send)
         try:
             data = response.json()
         except ValueError:
@@ -37,8 +37,8 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        self.next_action_time = time.time() + float(data.get('cooldown'))
-        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
         print("Response:", data)
 
 

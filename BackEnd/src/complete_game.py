@@ -19,4 +19,4 @@ if not player.has_dash:
   player.get_dash()
 
 while True:
-  player.go_next_block()
+  player.mine_next_block()

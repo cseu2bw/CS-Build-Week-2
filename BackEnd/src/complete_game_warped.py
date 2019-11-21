@@ -31,4 +31,4 @@ player.queue_func(player.actions.check_status)
 # player.travel("n")
 # player.queue_func(player.actions.warp)
 while True:
-  player.go_next_block_warped()
+  player.get_next_snitch()

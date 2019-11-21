@@ -27,6 +27,7 @@ class Player:
     self.init()
     self.has_dash = False
     self.has_flight = False
+    self.last_examine = dict()
     
   def next_action(self):
     cooldown = max(0, (self.next_action_time - time.time())) + 0.01 #Add buffer to prevent cooldown violation

@@ -19,7 +19,6 @@ class Actions:
         self.message = ''
         self.last_proof = Proof()
         self.new_proof = 0
-        # self.other_player = Status()
 
     def init(self):
         data = None
@@ -35,7 +34,7 @@ class Actions:
         self.player.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
 
     def move(self, dir, id=None):
-        if dir not in self.current_room.exits:
+        if dir not in self.player.current_room.exits:
             print('Invalid direction ' + dir)
             return
         to_send = {'direction': dir}
@@ -220,15 +219,12 @@ class Actions:
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
         self.player.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
-        print("Respose:", data)                        
+        print("Response:", data)                        
 
     def dash(self, dir, num_rooms, next_room_ids):
         if dir not in self.player.current_room.exits:
             print('Invalid direction ' + dir)
             return
-        # if int(num_rooms) != len(list(next_room_ids)):
-        #     print(f'number of rooms do not match {num_rooms} {next_room_ids}')
-        #     return    
         to_send = {'direction': dir, 'num_rooms': num_rooms, 'next_room_ids': next_room_ids}
         response = requests.post(self.base_url + '/adv/dash/', headers={'Authorization': self.player.token}, json=to_send)
         try:
@@ -240,7 +236,7 @@ class Actions:
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
         self.player.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
-        print("Respose:", data)
+        print("Response:", data)
 
     def carry(self, item):
         response = requests.post(self.base_url + '/adv/carry/',
@@ -338,7 +334,6 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        # self.message = data.get('messages')[0]
         print("Response:", data)
 
     def warp(self):
@@ -352,7 +347,6 @@ class Actions:
             print(response)
             return
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
-        # self.message = data.get('messages')[0]
         print("Response:", data)
 
     def get_last_proof(self):
@@ -368,31 +362,4 @@ class Actions:
         self.player.next_action_time = time.time() + float(data.get('cooldown'))
         self.last_proof = Proof(data.get('proof'), data.get('difficulty'), data.get(
             'cooldown'), data.get('message'), data.get('errors'))
-        print("Response:", data)        
-
-    ## Timi
-    # def mine_coin(self):
-    #     coins_mined = 0
-    #     print("Starting miner")
-    #     response = requests.get(url=self.base_url + "/bc/last_proof", headers={'Authorization': self.player.token})
-    #     try:
-    #         data = response.json()
-    #         print(data)
-    #     except ValueError:
-    #         print("Error:  Non-json response")
-    #         print("Response returned:")
-    #         print(response)
-    #         return response
-    #     self.player.next_action_time = time.time() + float(data.get('cooldown'))
-    #     if  len(data.get('messages')) > 1: 
-    #         self.message = data.get('messages')[0]
-    #     new_proof = self.proof_of_work(data.get('proof'),data.get('difficulty') )
-    #     post_data = {"proof": new_proof}
-
-    #     r = requests.post(url=self.base_url + "/bc/mine",headers={'Authorization': self.player.token}, json=post_data)
-    #     data = r.json()
-    #     if data.get('message') == 'New Block Forged':
-    #         coins_mined += 1
-    #         print("Total coins mined: " + str(coins_mined))
-    #     else:
-    #         print(data.get('message'))              
+        print("Response:", data)      

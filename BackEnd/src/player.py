@@ -47,7 +47,7 @@ class Player:
 
   def travel(self, dir, id=None):
     print(f"Trying to move {dir} to {id}")
-    if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
+    if self.has_flight:
       self.queue_func(self.actions.fly, dir, id)
       print(f"Flew in direction {dir}")
     elif dir in ['n', 's', 'e', 'w']:

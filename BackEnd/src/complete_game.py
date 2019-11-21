@@ -3,7 +3,10 @@ from player import Player
 import os
 import math
 
-name = os.environ['PLAYER_NAME']
+try:
+  name = os.environ['PLAYER_NAME']
+except:
+  print("Please set desired name in .env file (variable 'PLAYER_NAME')")
 
 game = Game()
 player = Player(game)

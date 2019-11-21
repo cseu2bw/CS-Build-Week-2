@@ -20,7 +20,14 @@ player.queue_func(player.actions.check_status)
 # if not player.has_dash:
 #   player.get_dash()
 
-while True:
-  player.collect_snitches(999999)
 
-# player.queue_func(player.travel_to_target, 784)
+# while True:
+#   player.go_next_block()
+
+# while True:
+#   player.collect_snitches(999999)
+
+# player.queue_func(player.travel_to_target, 555)
+
+while True:
+  player.go_next_block_warped()

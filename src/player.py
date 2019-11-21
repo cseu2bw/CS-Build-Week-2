@@ -186,6 +186,22 @@ class Player:
     self.queue_func(self.actions.proof_of_work, 
         self.actions.last_proof.proof, self.actions.last_proof.difficulty)
     self.queue_func(self.actions.mine, self.actions.new_proof)
+
+  def go_next_block_warped(self):
+    self.travel_to_target(self.game.well_id)
+    self.queue_func(self.actions.examine, 'WELL')
+    program ="#" + self.last_examine['description']
+    cpu = CPU()
+    cpu.load(program)
+    cpu.run()
+    room = int(cpu.pra_out.split(" ")[-1])
+    print(f'The golden snitch is in room {room}')
+    self.travel_to_target(room)
+    self.queue_func(self.actions.take, 'golden snitch')
+    # self.queue_func(self.actions.get_last_proof)
+    # self.queue_func(self.actions.proof_of_work, 
+    #     self.actions.last_proof.proof, self.actions.last_proof.difficulty)
+    # self.queue_func(self.actions.mine, self.actions.new_proof)    
     
   def init(self):
     data = None

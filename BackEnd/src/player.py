@@ -25,8 +25,8 @@ class Player:
     self.actions = Actions(self)
     self.status = Status()
     self.init()
-    self.has_dash = False if os.environ['HAS_DASH'] == 'False' else True
-    self.has_flight = False if os.environ['HAS_FLIGHT'] == 'False' else True
+    self.has_dash = False
+    self.has_flight = False
     
   def next_action(self):
     cooldown = max(0, (self.next_action_time - time.time())) + 0.1
@@ -143,3 +143,6 @@ class Player:
   def init(self):
     self.queue_func(self.actions.init)
     self.queue_func(self.actions.check_status)
+    self.has_dash = 'dash' in self.status.abilities
+    self.has_fly = 'fly' in self.status.abilities
+    print(self.has_dash, self.has_fly)

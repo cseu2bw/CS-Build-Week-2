@@ -341,6 +341,20 @@ class Actions:
         # self.message = data.get('messages')[0]
         print("Response:", data)
 
+    def warp(self):
+        response = requests.post(self.base_url + '/adv/warp/',
+                                 headers={'Authorization': self.player.token})
+        try:
+            data = response.json()
+        except ValueError:
+            print("Error:  Non-json response")
+            print("Response returned:")
+            print(response)
+            return
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        # self.message = data.get('messages')[0]
+        print("Response:", data)
+
     def get_last_proof(self):
         response = requests.get(self.base_url + '/bc/last_proof/',
                                  headers={'Authorization': self.player.token})

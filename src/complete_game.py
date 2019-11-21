@@ -15,9 +15,10 @@ if player.status.name != name:
     player.collect_treasures(target_items)
     player.sell_items()
   player.change_name(name)
-if not player.has_flight:
-  player.get_flight()
-if not player.has_dash:
-  player.get_dash()
-while True:
-  player.go_next_block()
+# if not player.has_flight:
+#   player.get_flight()
+# if not player.has_dash:
+#   player.get_dash()
+# while True:
+#   player.go_next_block()
+# player.queue_func(player.actions.pray)

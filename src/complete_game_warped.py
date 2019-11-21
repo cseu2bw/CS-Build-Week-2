@@ -28,6 +28,7 @@ player.queue_func(player.actions.check_status)
 #   player.collect_snitches(999999)
 
 # player.queue_func(player.travel_to_target, 555)
-
+# player.travel("n")
+# player.queue_func(player.actions.warp)
 while True:
   player.go_next_block_warped()

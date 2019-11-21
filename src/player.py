@@ -48,7 +48,7 @@ class Player:
     print("Respose:", data)
 
   def next_action(self):
-    cooldown = max(0, (self.next_action_time - time.time())) + 0.1
+    cooldown = max(0, (self.next_action_time - time.time())) + 0.01
     time.sleep(cooldown)
     print(f"Running next action from cooldown {cooldown}")
     self.next_action_time = time.time()
@@ -64,18 +64,18 @@ class Player:
     if len(self.queue) == 1:
       self.next_action()
 
-#   def travel(self, dir, id=None):
-#     print(f"Trying to move {dir} to {id}")
-#     if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
-#       self.queue_func(self.actions.fly, dir, id)
-#       print(f"Flew in direction {dir}")
-#     elif dir in ['n', 's', 'e', 'w']:
-#       self.queue_func(self.move, dir, id)
-
   def travel(self, dir, id=None):
     print(f"Trying to move {dir} to {id}")
-    if dir in ['n', 's', 'e', 'w']:
+    if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
+      self.queue_func(self.actions.fly, dir, id)
+      print(f"Flew in direction {dir}")
+    elif dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
+
+  # def travel(self, dir, id=None):
+  #   print(f"Trying to move {dir} to {id}")
+  #   if dir in ['n', 's', 'e', 'w']:
+  #     self.queue_func(self.move, dir, id)
   
   def travel_path(self, path):
     dashes = self.get_path_dashes(path)

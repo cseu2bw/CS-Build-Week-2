@@ -145,4 +145,3 @@ class Player:
     self.queue_func(self.actions.check_status)
     self.has_dash = 'dash' in self.status.abilities
     self.has_fly = 'fly' in self.status.abilities
-    print(self.has_dash, self.has_fly)

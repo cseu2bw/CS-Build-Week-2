@@ -26,27 +26,7 @@ class Player:
     self.status = Status()
     self.has_dash = False if os.environ['HAS_DASH'] == 'False' else True
     self.has_flight = False if os.environ['HAS_FLIGHT'] == 'False' else True
-
-  def move(self, dir, id=None):
-    if dir not in self.current_room.exits:
-      print('Invalid direction ' + dir)
-      return
-    to_send = {'direction': dir}
-    if id is not None:
-      to_send["next_room_id"] = str(id)
-      print(f'Moving into known room {id}')
-    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json=to_send)
-    try:
-        data = response.json()
-    except ValueError:
-        print("Error:  Non-json response")
-        print("Response returned:")
-        print(response)
-        return
-    self.next_action_time = time.time() + float(data.get('cooldown'))
-    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
-    print("Response:", data)
-
+    
   def next_action(self):
     cooldown = max(0, (self.next_action_time - time.time())) + 0.1
     time.sleep(cooldown)

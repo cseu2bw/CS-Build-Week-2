@@ -64,12 +64,17 @@ class Player:
     if len(self.queue) == 1:
       self.next_action()
 
+#   def travel(self, dir, id=None):
+#     print(f"Trying to move {dir} to {id}")
+#     if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
+#       self.queue_func(self.actions.fly, dir, id)
+#       print(f"Flew in direction {dir}")
+#     elif dir in ['n', 's', 'e', 'w']:
+#       self.queue_func(self.move, dir, id)
+
   def travel(self, dir, id=None):
     print(f"Trying to move {dir} to {id}")
-    if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
-      self.queue_func(self.actions.fly, dir, id)
-      print(f"Flew in direction {dir}")
-    elif dir in ['n', 's', 'e', 'w']:
+    if dir in ['n', 's', 'e', 'w']:
       self.queue_func(self.move, dir, id)
   
   def travel_path(self, path):
@@ -101,6 +106,7 @@ class Player:
 
   def travel_to_target(self, room_id):
     path = self.game.find_path_to(self, room_id)
+    print(path)
     self.travel_path(path)
 
   def collect_treasures(self, target_items):
@@ -115,6 +121,21 @@ class Player:
           self.queue_func(self.actions.take, item)
           current_items += 1
           print("Current items:", current_items)
+
+  def collect_snitches(self, target_items):
+    visited = set()
+    current_items = 0
+    while current_items < target_items:
+      path = self.game.find_closest_unvisited(self, visited)
+      self.travel_path(path)
+      visited.add(self.current_room.id)
+      if len(self.current_room.items) > 0:
+        for item in self.current_room.items:
+            if item == 'golden snitch':
+                self.queue_func(self.actions.take, item)
+                current_items += 1
+                print("Current items:", current_items)
+                visited = set()          
 
   def get_dash(self):
     self.travel_to_target(self.game.dash_shrine_id)

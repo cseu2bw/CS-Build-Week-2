@@ -127,7 +127,7 @@ class Player:
     self.queue_func(self.actions.check_status)
     print("Name", self.status.name)
     
-  def go_next_block(self):
+  def mine_next_block(self):
     self.travel_to_target(self.game.well_id)
     self.queue_func(self.actions.examine, 'WELL')
     program ="#" + self.last_examine['description']

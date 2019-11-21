@@ -63,6 +63,7 @@ class Game:
                    break
                 visited.add(vert)
                 for room in adj[vert].values():
+                    print(room)
                     new_path = list(path)
                     new_path.append(room)
                     queue.enqueue(new_path)

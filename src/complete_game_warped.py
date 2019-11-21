@@ -19,7 +19,8 @@ player.queue_func(player.actions.check_status)
 #   player.get_flight()
 # if not player.has_dash:
 #   player.get_dash()
-# while True:
-#   player.collect_snitches(999999)
 
-player.travel_to_target(916)
+while True:
+  player.collect_snitches(999999)
+
+# player.queue_func(player.travel_to_target, 784)

@@ -8,8 +8,11 @@ from actions import Actions
 from status import Status
 from ls8 import CPU
 
-base_url = os.environ['BASE_URL']
-token  = os.environ['TOKEN']
+try:
+  base_url = os.environ['BASE_URL']
+  token  = os.environ['TOKEN']
+except:
+  print("Please set both BASE_URL and TOKEN in env file")
 
 if token == '' or token is None:
   print('Invalid token')

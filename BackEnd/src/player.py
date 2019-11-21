@@ -29,7 +29,7 @@ class Player:
     self.has_flight = False
     
   def next_action(self):
-    cooldown = max(0, (self.next_action_time - time.time())) + 0.01
+    cooldown = max(0, (self.next_action_time - time.time())) + 0.01 #Add buffer to prevent cooldown violation
     time.sleep(cooldown)
     print(f"Running next action from cooldown {cooldown}")
     self.next_action_time = time.time()
@@ -141,7 +141,7 @@ class Player:
         self.actions.last_proof.proof, self.actions.last_proof.difficulty)
     self.queue_func(self.actions.mine, self.actions.new_proof)
 
-  def go_next_block_warped(self):
+  def get_next_snitch(self):
     self.travel_to_target(self.game.well_id)
     self.queue_func(self.actions.examine, 'WELL')
     program ="#" + self.last_examine['description']
@@ -151,10 +151,10 @@ class Player:
     room = int(cpu.pra_out.split(" ")[-1])
     print(f'The golden snitch is in room {room}')
     self.travel_to_target(room)
-    self.queue_func(self.actions.take, 'golden snitch')   
+    self.queue_func(self.actions.take, 'golden snitch') # Try to pick up snitch
     
   def init(self):
     self.queue_func(self.actions.init)
-    self.queue_func(self.actions.check_status)
+    self.queue_func(self.actions.check_status) # To check if we have abilities
     self.has_dash = 'dash' in self.status.abilities
     self.has_fly = 'fly' in self.status.abilities

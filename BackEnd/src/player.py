@@ -8,8 +8,11 @@ from actions import Actions
 from status import Status
 from ls8 import CPU
 
-base_url = os.environ['BASE_URL']
-token  = os.environ['TOKEN']
+try:
+  base_url = os.environ['BASE_URL']
+  token  = os.environ['TOKEN']
+except:
+  print("Please set both BASE_URL and TOKEN in env file")
 
 if token == '' or token is None:
   print('Invalid token')
@@ -24,31 +27,13 @@ class Player:
     self.game = game
     self.actions = Actions(self)
     self.status = Status()
-    self.has_dash = False if os.environ['HAS_DASH'] == 'False' else True
-    self.has_flight = False if os.environ['HAS_FLIGHT'] == 'False' else True
-
-  def move(self, dir, id=None):
-    if dir not in self.current_room.exits:
-      print('Invalid direction ' + dir)
-      return
-    to_send = {'direction': dir}
-    if id is not None:
-      to_send["next_room_id"] = str(id)
-      print(f'Moving into known room {id}')
-    response = requests.post(self.base_url + '/adv/move/', headers={'Authorization': self.token}, json=to_send)
-    try:
-        data = response.json()
-    except ValueError:
-        print("Error:  Non-json response")
-        print("Response returned:")
-        print(response)
-        return
-    self.next_action_time = time.time() + float(data.get('cooldown'))
-    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
-    print("Respose:", data)
-
+    self.init()
+    self.has_dash = True
+    self.has_flight = True
+    self.last_examine = dict()
+    
   def next_action(self):
-    cooldown = max(0, (self.next_action_time - time.time())) + 0.01
+    cooldown = max(0, (self.next_action_time - time.time())) + 0.01 #Add buffer to prevent cooldown violation
     time.sleep(cooldown)
     print(f"Running next action from cooldown {cooldown}")
     self.next_action_time = time.time()
@@ -66,16 +51,11 @@ class Player:
 
   def travel(self, dir, id=None):
     print(f"Trying to move {dir} to {id}")
-    if self.has_flight and self.current_room.elevation < self.game.saved_rooms['rooms'][id]['elevation']:
+    if self.has_flight:
       self.queue_func(self.actions.fly, dir, id)
       print(f"Flew in direction {dir}")
     elif dir in ['n', 's', 'e', 'w']:
-      self.queue_func(self.move, dir, id)
-
-  # def travel(self, dir, id=None):
-  #   print(f"Trying to move {dir} to {id}")
-  #   if dir in ['n', 's', 'e', 'w']:
-  #     self.queue_func(self.move, dir, id)
+      self.queue_func(self.actions.move, dir, id)
   
   def travel_path(self, path):
     dashes = self.get_path_dashes(path)
@@ -120,29 +100,7 @@ class Player:
         for item in self.current_room.items:
           self.queue_func(self.actions.take, item)
           current_items += 1
-          print("Current items:", current_items)
-
-  def collect_snitches(self, target_items):
-    visited = set()
-    current_items = 0
-    while current_items < target_items:
-      path = self.game.find_closest_unvisited(self, visited)
-      self.travel_path(path)
-      visited.add(self.current_room.id)
-      print(f'rooms visited since last found: {len(visited)}')
-      if len(self.current_room.items) > 0:
-        for item in self.current_room.items:
-            if item == 'golden snitch':
-                self.queue_func(self.actions.take, item)
-                current_items += 1
-                print("Current items:", current_items)
-                print('You found another one!!!')
-                print('You found another one!')
-                print('You found another one!')
-                print('You found another one!')
-                print('You found another one!')
-                print('You found another one!')
-                visited = set()          
+          print("Current items:", current_items)       
 
   def get_dash(self):
     self.travel_to_target(self.game.dash_shrine_id)
@@ -173,7 +131,7 @@ class Player:
     self.queue_func(self.actions.check_status)
     print("Name", self.status.name)
     
-  def go_next_block(self):
+  def mine_next_block(self):
     self.travel_to_target(self.game.well_id)
     self.queue_func(self.actions.examine, 'WELL')
     program ="#" + self.last_examine['description']
@@ -187,7 +145,7 @@ class Player:
         self.actions.last_proof.proof, self.actions.last_proof.difficulty)
     self.queue_func(self.actions.mine, self.actions.new_proof)
 
-  def go_next_block_warped(self):
+  def get_next_snitch(self):
     self.travel_to_target(self.game.well_id)
     self.queue_func(self.actions.examine, 'WELL')
     program ="#" + self.last_examine['description']
@@ -197,21 +155,10 @@ class Player:
     room = int(cpu.pra_out.split(" ")[-1])
     print(f'The golden snitch is in room {room}')
     self.travel_to_target(room)
-    self.queue_func(self.actions.take, 'golden snitch')
-    # self.queue_func(self.actions.get_last_proof)
-    # self.queue_func(self.actions.proof_of_work, 
-    #     self.actions.last_proof.proof, self.actions.last_proof.difficulty)
-    # self.queue_func(self.actions.mine, self.actions.new_proof)    
+    self.queue_func(self.actions.take, 'golden snitch') # Try to pick up snitch
     
   def init(self):
-    data = None
-    response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})
-    try:
-        data = response.json()
-    except ValueError:
-        print("Error:  Non-json response")
-        print("Response returned:")
-        print(response)
-        return
-    self.next_action_time = time.time() + float(data.get('cooldown'))
-    self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+    self.queue_func(self.actions.init)
+    self.queue_func(self.actions.check_status) # To check if we have abilities
+    self.has_dash = 'dash' in self.status.abilities
+    self.has_flight = 'fly' in self.status.abilities

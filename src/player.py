@@ -129,12 +129,19 @@ class Player:
       path = self.game.find_closest_unvisited(self, visited)
       self.travel_path(path)
       visited.add(self.current_room.id)
+      print(f'rooms visited since last found: {len(visited)}')
       if len(self.current_room.items) > 0:
         for item in self.current_room.items:
             if item == 'golden snitch':
                 self.queue_func(self.actions.take, item)
                 current_items += 1
                 print("Current items:", current_items)
+                print('You found another one!!!')
+                print('You found another one!')
+                print('You found another one!')
+                print('You found another one!')
+                print('You found another one!')
+                print('You found another one!')
                 visited = set()          
 
   def get_dash(self):

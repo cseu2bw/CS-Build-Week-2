@@ -23,7 +23,7 @@ class Actions:
 
     def init(self):
         data = None
-        response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.token})
+        response = requests.get(self.base_url + '/adv/init/', headers={'Authorization': self.player.token})
         try:
             data = response.json()
         except ValueError:
@@ -31,8 +31,8 @@ class Actions:
             print("Response returned:")
             print(response)
             return
-        self.next_action_time = time.time() + float(data.get('cooldown'))
-        self.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
+        self.player.next_action_time = time.time() + float(data.get('cooldown'))
+        self.player.current_room = Room(data.get('room_id'), data.get('exits'), data.get('title'), data.get('description'), data.get('coordinates'), data.get('elevation'), data.get('terrain'), data.get('items'))
 
     def move(self, dir, id=None):
         if dir not in self.current_room.exits:
